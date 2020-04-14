@@ -33,7 +33,9 @@ CPoint OK_BTN_BLUE_COLOR_PNT(979, 582);
 COLORREF OK_BTN_BLUE_COLOR = RGB(63, 151, 240);
 
 
-int ACTION_DELAY = 500;
+int ACTION_DELAY_200 = 200;
+int ACTION_DELAY_500 = 500;
+int ACTION_DELAY_1000 = 1000;
 // CAboutDlg dialog used for App About
 
 MYSQL m_sqlCon;
@@ -198,6 +200,27 @@ HCURSOR CGFTraderDlg::OnQueryDragIcon()
 HWND GF = NULL;
 CWnd* GF_Wnd = NULL;
 
+
+BOOL CALLBACK EnumChildProc(HWND hwndChild, LPARAM lParam)
+{
+	LPRECT rcParent;
+	int i, idChild;
+	idChild = GetWindowLong(hwndChild, GWL_ID);
+
+	TCHAR buf[512];
+	::GetClassName(hwndChild, (LPWSTR)buf, 512);
+	CString str = buf;
+	str.TrimRight();
+
+	AfxTrace((CString)"\nChild Window ClassName:[" + str + "]");
+
+	EnumChildWindows(hwndChild, EnumChildProc, NULL);
+
+	//ShowWindow(hwndChild, SW_SHOW);
+
+	return TRUE;
+}
+
 BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
 {
 	TCHAR lpString[512];
@@ -218,6 +241,8 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
 		msg.Format(_T("HWND:%d, Caption:%s, Class:%s\n"), hwnd, caption, lpString);
 		//AfxMessageBox(msg);
 		GF = hwnd;
+
+		//EnumChildWindows(GF, EnumChildProc, NULL);
 
 		/*HWND hWndChild = ::GetWindow(GF, GW_CHILD);
 
@@ -266,6 +291,9 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
 	return true;
 }
 
+
+
+
 CString lst_stock = (CString)"";
 CString lst_qty = (CString)"";
 CString lst_price = (CString)"";
@@ -293,16 +321,16 @@ DWORD WINAPI ThreadTrade(LPVOID pParam)
 
 			if (ts.GetLength() > 0)
 			{
-				GF_Wnd->ShowWindow(SW_HIDE);
-				::Sleep(200);
+				//GF_Wnd->ShowWindow(SW_HIDE);
+				//::Sleep(200);
 				//maximize window.
 				GF_Wnd->ShowWindow(SW_MAXIMIZE);
-				::Sleep(200);
+				::Sleep(ACTION_DELAY_200);
 
 				//open trading panel.
 				dlg->clickMouse(GF_Wnd, TRADE_MENU);
 				
-				::Sleep(200);
+				::Sleep(ACTION_DELAY_200);
 
 				CString action = ts.Left(1);
 				CString code = ts.Mid(1, 6);
@@ -315,20 +343,20 @@ DWORD WINAPI ThreadTrade(LPVOID pParam)
 				if (action == "B")
 				{
 					dlg->clickMouse(GF_Wnd, BUY_MENU);
-					::Sleep(ACTION_DELAY);
+					::Sleep(ACTION_DELAY_200);
 					dlg->clickMouse(GF_Wnd, STOCK_FIELD);
 					dlg->clearField(GF_Wnd);
-					::Sleep(ACTION_DELAY);
+					::Sleep(ACTION_DELAY_200);
 					dlg->sendString(GF_Wnd, code);
-					::Sleep(ACTION_DELAY);
+					::Sleep(ACTION_DELAY_1000);
 					dlg->clickMouse(GF_Wnd, QTY_FIELD);
-					::Sleep(ACTION_DELAY);
+					::Sleep(ACTION_DELAY_200);
 					dlg->sendString(GF_Wnd, qty);
-					::Sleep(ACTION_DELAY);
+					::Sleep(ACTION_DELAY_200);
 					dlg->clickMouse(GF_Wnd, BUY_SELL_BTN);
-					::Sleep(ACTION_DELAY);
+					::Sleep(ACTION_DELAY_1000);
 					dlg->clickMouse(GF_Wnd, YES_CONFIRM);
-					::Sleep(ACTION_DELAY);
+					::Sleep(ACTION_DELAY_500);
 					//dlg->clickMouse(pWnd, MSG_CONFIRM);
 					if (dlg->checkTradeSuccess())
 					{
@@ -346,20 +374,20 @@ DWORD WINAPI ThreadTrade(LPVOID pParam)
 				else if (action == 'S')
 				{
 					dlg->clickMouse(GF_Wnd, SELL_MENU);
-					::Sleep(ACTION_DELAY);
+					::Sleep(ACTION_DELAY_200);
 					dlg->clickMouse(GF_Wnd, STOCK_FIELD);
 					dlg->clearField(GF_Wnd);
-					::Sleep(ACTION_DELAY);
+					::Sleep(ACTION_DELAY_200);
 					dlg->sendString(GF_Wnd, code);
-					::Sleep(ACTION_DELAY);
+					::Sleep(ACTION_DELAY_1000);
 					dlg->clickMouse(GF_Wnd, QTY_FIELD);
-					::Sleep(ACTION_DELAY);
+					::Sleep(ACTION_DELAY_200);
 					dlg->sendString(GF_Wnd, qty);
-					::Sleep(ACTION_DELAY);
+					::Sleep(ACTION_DELAY_200);
 					dlg->clickMouse(GF_Wnd, BUY_SELL_BTN);
-					::Sleep(ACTION_DELAY);
+					::Sleep(ACTION_DELAY_1000);
 					dlg->clickMouse(GF_Wnd, YES_CONFIRM);
-					::Sleep(ACTION_DELAY);
+					::Sleep(ACTION_DELAY_500);
 					//dlg->clickMouse(pWnd, MSG_CONFIRM);
 					if (dlg->checkTradeSuccess())
 					{
@@ -374,10 +402,10 @@ DWORD WINAPI ThreadTrade(LPVOID pParam)
 					lst_qty = qty;
 					lst_price = "0.0";
 				}
-				::Sleep(2 * ACTION_DELAY);
+				::Sleep(ACTION_DELAY_500);
 			}
 			else {
-				::Sleep(3 * ACTION_DELAY);
+				::Sleep(ACTION_DELAY_1000);
 			}
 		}
 	}
@@ -432,6 +460,7 @@ boolean CGFTraderDlg::getMYSQLConnection()
 			MessageBox(e);
 			return false;
 		}
+		mysql_init_flg = true;
 	}
 	return true;
 }
@@ -525,6 +554,7 @@ CString CGFTraderDlg::getTradeString(CString &lst_stock, CString &lst_qty, CStri
 				}
 			}
 			mysql_free_result(m_res);
+			mysql_close(&m_sqlCon);
 		return rtv;
 	}
 }
@@ -592,7 +622,6 @@ void CGFTraderDlg::OnBnClickedStop()
 	// TODO: Add your control notification handler code here
 	stop_trade = true;
 	bck_thread = NULL;
-	mysql_close(&m_sqlCon);
 	CButton* pBtn1 = (CButton*)this->GetDlgItem(IDTRADE);
 	pBtn1->EnableWindow(stop_trade);
 	CButton* pBtn2 = (CButton*)this->GetDlgItem(IDSTOP);
