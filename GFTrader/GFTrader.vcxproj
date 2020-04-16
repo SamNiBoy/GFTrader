@@ -95,12 +95,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>D:\softwares\mysql-8.0.19-winx64\include;D:\softwares\mysql-8.0.19-winx64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\mysql-8.0.19-winx64\include;D:\mysql-8.0.19-winx64\include;D:\softwares\mysql-8.0.19-winx64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>D:\softwares\mysql-8.0.19-winx64\lib;D:\softwares\mysql-8.0.19-winx64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libmysql.lib;mysqlservices.lib;mysqlclient.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\mysql-8.0.19-winx64\lib;D:\mysql-8.0.19-winx64\lib;D:\softwares\mysql-8.0.19-winx64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libmysql.lib;mysqlclient.lib;mysqlservices.lib</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -120,12 +120,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>D:\softwares\mysql-8.0.19-winx64\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\mysql-8.0.19-winx64\include;D:\softwares\mysql-8.0.19-winx64\include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>D:\softwares\mysql-8.0.19-winx64\lib;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libmysql.lib;mysqlservices.lib;mysqlclient.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\mysql-8.0.19-winx64\lib;D:\softwares\mysql-8.0.19-winx64\lib;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libmysql.lib;mysqlclient.lib;mysqlservices.lib</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -147,11 +147,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>D:\mysql-8.0.19-winx64\include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>D:\mysql-8.0.19-winx64\lib;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libmysql.lib;mysqlclient.lib;mysqlservices.lib</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -173,14 +176,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>D:\softwares\mysql-8.0.19-winx64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\mysql-8.0.19-winx64\include;D:\softwares\mysql-8.0.19-winx64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>libmysql.lib;mysqlservices.lib;mysqlclient.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>D:\softwares\mysql-8.0.19-winx64\lib;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libmysql.lib;mysqlclient.lib;mysqlservices.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\mysql-8.0.19-winx64\lib;D:\softwares\mysql-8.0.19-winx64\lib;</AdditionalLibraryDirectories>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>

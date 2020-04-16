@@ -233,7 +233,7 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
 
 	CString msg;
 	msg.Format(_T("HWND:[%d], Caption:[%s], Class:[%s]\n"), hwnd, caption, lpString);
-	AfxTrace(msg);
+	//AfxTrace(msg);
 	//if (strcmp("Chrome_WidgetWin_1", (char*)lpString) == 0)
 	if ((CString)"广发操盘手" == caption)
 	{
@@ -298,6 +298,7 @@ CString lst_stock = (CString)"";
 CString lst_qty = (CString)"";
 CString lst_price = (CString)"";
 CString success_flg = (CString)"N";
+CString lst_id = (CString)"";
 
 DWORD WINAPI ThreadTrade(LPVOID pParam)
 {
@@ -499,7 +500,7 @@ CString CGFTraderDlg::getTradeString(CString &lst_stock, CString &lst_qty, CStri
 				lst_price = " success_price";
 			}
 
-			mysql_query(&m_sqlCon, (CString)"update pendingTrade set status = '" + status  + "', success_qty = " + lst_qty + ", success_price = " + lst_price + " where stock = '" + lst_stock + "' and status = 'N'");
+			mysql_query(&m_sqlCon, (CString)"update pendingTrade set status = '" + status  + "', success_qty = " + lst_qty + ", success_price = " + lst_price + " where stock = '" + lst_stock + "' and id = " + lst_id + " and status = 'N'");
 			
 			int count = mysql_affected_rows(&m_sqlCon);
 
@@ -518,12 +519,13 @@ CString CGFTraderDlg::getTradeString(CString &lst_stock, CString &lst_qty, CStri
 			lst_stock = "";
 			lst_qty = "";
 			lst_price = "";
+			lst_id = "";
 		}
 		
 		//mysql_query(&m_sqlCon, "SET NAMES 'UTF-8'");//解决从数据库中读取数据后汉字乱码显示的问题  
 
 			//查询数据
-			if (mysql_query(&m_sqlCon, "select stock, qty, price, is_buy_flg from pendingTrade where status = 'N' order by stock"))
+			if (mysql_query(&m_sqlCon, "select stock, id, qty, price, is_buy_flg from pendingTrade where status = 'N' order by stock"))
 				return (CString)"";
 
 			//获取结果集
@@ -536,9 +538,10 @@ CString CGFTraderDlg::getTradeString(CString &lst_stock, CString &lst_qty, CStri
 			{
 
 				CString stock_id = (CString)m_row[0];
-				CString qty = (CString)m_row[1];
-				CString price = (CString)m_row[2];
-				CString is_buy_flg = (CString)m_row[3];
+				lst_id = (CString)m_row[1];
+				CString qty = (CString)m_row[2];
+				CString price = (CString)m_row[3];
+				CString is_buy_flg = (CString)m_row[4];
 
 				CString onerecord;
 				onerecord.Format((CString)"\nStock:%s - Qty:%s - Price:%s, isBuy:%s\n", stock_id, qty, price, is_buy_flg);
