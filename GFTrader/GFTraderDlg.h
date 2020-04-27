@@ -38,12 +38,12 @@ public:
 		void sendString(CWnd* pWnd, CString str);
 	void clearField(CWnd* pWnd);
 	void OnBnClickedCancel();
-	afx_msg
-		boolean checkTradeSuccess();
 	void OnBnClickedTrade();
+	afx_msg boolean checkPointHasColor(CPoint pt, COLORREF clr);
 	boolean getMYSQLConnection();
 	CString getTradeString(CString& lst_stock, CString& lst_qty, CString& lst_price, CString success_flg);
 	void clickMouse(CWnd* pwnd, CPoint pt);
 	void pressKey(CWnd* pwnd, CHAR c);
-	afx_msg void OnBnClickedStop();
+	afx_msg void OnBnClickedBalance();
+	afx_msg void OnBnClickedStoptrade();
 };

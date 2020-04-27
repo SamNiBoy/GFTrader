@@ -1,9 +1,9 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
-// Used by GFTrader.rc
+// Microsoft Visual C++ 生成的包含文件。
+// 供 GFTrader.rc 使用
 //
-#define IDCANCEL2                       6
-#define IDSTOP                          6
+#define IDBALANCE                       6
+#define IDSTOPTRADE                     7
 #define IDM_ABOUTBOX                    0x0010
 #define IDD_ABOUTBOX                    100
 #define IDS_ABOUTBOX                    101

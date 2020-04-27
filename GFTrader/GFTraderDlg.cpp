@@ -25,7 +25,8 @@ CPoint SELL_MENU(48, 105);
 CPoint STOCK_FIELD(271, 114);
 CPoint QTY_FIELD(210, 243);
 CPoint BUY_SELL_BTN(268, 340);
-CPoint YES_CONFIRM(1027, 631);
+CPoint YES_CONFIRM_PNT(1047, 634);
+COLORREF YES_CONFIRM_BLUE_COLOR = RGB(63, 151, 240);
 CPoint NO_CONFIRM(1090, 633);
 CPoint MSG_CONFIRM(959, 583);
 
@@ -62,6 +63,8 @@ public:
 // Implementation
 protected:
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnBnClickedStop();
 };
 
 CAboutDlg::CAboutDlg() : CDialogEx(IDD_ABOUTBOX)
@@ -98,7 +101,8 @@ BEGIN_MESSAGE_MAP(CGFTraderDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDCANCEL, &CGFTraderDlg::OnBnClickedCancel)
 	ON_BN_CLICKED(IDTRADE, &CGFTraderDlg::OnBnClickedTrade)
-	ON_BN_CLICKED(IDSTOP, &CGFTraderDlg::OnBnClickedStop)
+	ON_BN_CLICKED(IDBALANCE, &CGFTraderDlg::OnBnClickedBalance)
+	ON_BN_CLICKED(IDSTOPTRADE, &CGFTraderDlg::OnBnClickedStoptrade)
 END_MESSAGE_MAP()
 
 
@@ -203,8 +207,7 @@ CWnd* GF_Wnd = NULL;
 
 BOOL CALLBACK EnumChildProc(HWND hwndChild, LPARAM lParam)
 {
-	LPRECT rcParent;
-	int i, idChild;
+	int idChild;
 	idChild = GetWindowLong(hwndChild, GWL_ID);
 
 	TCHAR buf[512];
@@ -345,29 +348,49 @@ DWORD WINAPI ThreadTrade(LPVOID pParam)
 				{
 					dlg->clickMouse(GF_Wnd, BUY_MENU);
 					::Sleep(ACTION_DELAY_200);
+
+				BuyAgain:
+
 					dlg->clickMouse(GF_Wnd, STOCK_FIELD);
 					dlg->clearField(GF_Wnd);
 					::Sleep(ACTION_DELAY_200);
 					dlg->sendString(GF_Wnd, code);
 					::Sleep(ACTION_DELAY_1000);
+
 					dlg->clickMouse(GF_Wnd, QTY_FIELD);
+					dlg->clearField(GF_Wnd);
 					::Sleep(ACTION_DELAY_200);
 					dlg->sendString(GF_Wnd, qty);
 					::Sleep(ACTION_DELAY_200);
+
 					dlg->clickMouse(GF_Wnd, BUY_SELL_BTN);
 					::Sleep(ACTION_DELAY_1000);
-					dlg->clickMouse(GF_Wnd, YES_CONFIRM);
-					::Sleep(ACTION_DELAY_500);
-					//dlg->clickMouse(pWnd, MSG_CONFIRM);
-					if (dlg->checkTradeSuccess())
+
+					if (dlg->checkPointHasColor(YES_CONFIRM_PNT, YES_CONFIRM_BLUE_COLOR))
 					{
-						success_flg = "Y";
+						dlg->clickMouse(GF_Wnd, YES_CONFIRM_PNT);
+						::Sleep(ACTION_DELAY_500);
+
+						if (dlg->checkPointHasColor(OK_BTN_BLUE_COLOR_PNT, OK_BTN_BLUE_COLOR))
+						{
+							success_flg = "N";
+							dlg->clickMouse(GF_Wnd, OK_BTN_BLUE_COLOR_PNT);
+						}
+						else
+						{
+							success_flg = "Y";
+						}
+					}
+					else if (dlg->checkPointHasColor(OK_BTN_BLUE_COLOR_PNT, OK_BTN_BLUE_COLOR))
+					{
+							success_flg = "N";
+							dlg->clickMouse(GF_Wnd, OK_BTN_BLUE_COLOR_PNT);
 					}
 					else
 					{
-						success_flg = "N";
-						dlg->clickMouse(GF_Wnd, OK_BTN_BLUE_COLOR_PNT);
+						goto BuyAgain;
 					}
+
 					lst_stock = code;
 					lst_qty = qty;
 					lst_price = "0.0";
@@ -376,29 +399,48 @@ DWORD WINAPI ThreadTrade(LPVOID pParam)
 				{
 					dlg->clickMouse(GF_Wnd, SELL_MENU);
 					::Sleep(ACTION_DELAY_200);
+
+				SellAgain:
+
 					dlg->clickMouse(GF_Wnd, STOCK_FIELD);
 					dlg->clearField(GF_Wnd);
 					::Sleep(ACTION_DELAY_200);
 					dlg->sendString(GF_Wnd, code);
 					::Sleep(ACTION_DELAY_1000);
+
 					dlg->clickMouse(GF_Wnd, QTY_FIELD);
+					dlg->clearField(GF_Wnd);
 					::Sleep(ACTION_DELAY_200);
 					dlg->sendString(GF_Wnd, qty);
 					::Sleep(ACTION_DELAY_200);
 					dlg->clickMouse(GF_Wnd, BUY_SELL_BTN);
 					::Sleep(ACTION_DELAY_1000);
-					dlg->clickMouse(GF_Wnd, YES_CONFIRM);
-					::Sleep(ACTION_DELAY_500);
-					//dlg->clickMouse(pWnd, MSG_CONFIRM);
-					if (dlg->checkTradeSuccess())
+
+					if (dlg->checkPointHasColor(YES_CONFIRM_PNT, YES_CONFIRM_BLUE_COLOR))
 					{
-						success_flg = "Y";
+						dlg->clickMouse(GF_Wnd, YES_CONFIRM_PNT);
+						::Sleep(ACTION_DELAY_500);
+
+						if (dlg->checkPointHasColor(OK_BTN_BLUE_COLOR_PNT, OK_BTN_BLUE_COLOR))
+						{
+							success_flg = "N";
+							dlg->clickMouse(GF_Wnd, OK_BTN_BLUE_COLOR_PNT);
+						}
+						else
+						{
+							success_flg = "Y";
+						}
 					}
-					else
+					else if (dlg->checkPointHasColor(OK_BTN_BLUE_COLOR_PNT, OK_BTN_BLUE_COLOR))
 					{
 						success_flg = "N";
 						dlg->clickMouse(GF_Wnd, OK_BTN_BLUE_COLOR_PNT);
 					}
+					else
+					{
+						goto SellAgain;
+					}
+
 					lst_stock = code;
 					lst_qty = qty;
 					lst_price = "0.0";
@@ -417,11 +459,11 @@ DWORD WINAPI ThreadTrade(LPVOID pParam)
 	return 0;
 }
 
-boolean CGFTraderDlg::checkTradeSuccess()
+boolean CGFTraderDlg::checkPointHasColor(CPoint pt, COLORREF clr)
 {
-	CWindowDC dc(GetDesktopWindow());
+	CWindowDC dc(CWnd::FromHandle(GF));
 
-	COLORREF color = dc.GetPixel(OK_BTN_BLUE_COLOR_PNT);
+	COLORREF color = dc.GetPixel(pt);
 
 	int Red = GetRValue(color);
 	int Green = GetGValue(color);
@@ -429,14 +471,14 @@ boolean CGFTraderDlg::checkTradeSuccess()
 
 
 	CString msg;
-	msg.Format(_T("OK_BTN_BLUECOLOR CHECK:%ld vs %ld"), color, OK_BTN_BLUE_COLOR);
+	msg.Format(_T("OK_BTN_BLUECOLOR CHECK:%ld vs %ld"), color, clr);
 	AfxTrace(msg);
 	//AfxMessageBox(msg);
-	if (color == OK_BTN_BLUE_COLOR)
+	if (color == clr)
 	{
-		return false;
+		return true;
 	}
-	return true;
+	return false;
 }
 
 CWinThread *bck_thread = NULL;
@@ -454,7 +496,8 @@ boolean CGFTraderDlg::getMYSQLConnection()
 		char value = 1;
 		mysql_options(&m_sqlCon, MYSQL_OPT_RECONNECT, &value);
 		// localhost:服务器 root/123456为账号密码 managesystemdb为数据库名 3306为端口    
-		if (!mysql_real_connect(&m_sqlCon, "111.229.27.150", "root", "mysql,16", "StockApp", 3306, NULL, 0))
+		//if (!mysql_real_connect(&m_sqlCon, "111.229.27.150", "root", "mysql,16", "StockApp", 3306, NULL, 0))
+		if (!mysql_real_connect(&m_sqlCon, "127.0.0.1", "root", "mysql,16", "StockApp", 3306, NULL, 0))
 		{
 			AfxMessageBox(_T("访问数据库失败!"));
 			CString e = (CString)mysql_error(&m_sqlCon);//需要将项目属性中字符集修改为“使用多字节字符集”或“未设置”  
@@ -514,7 +557,7 @@ CString CGFTraderDlg::getTradeString(CString &lst_stock, CString &lst_qty, CStri
 			}
 
 			CString msg;
-			msg.Format(_T("pendingTrade table updated with %d rows.", count));
+			msg.Format(_T("pendingTrade table updated with %d rows."), count);
 			AfxTrace(msg);
 			lst_stock = "";
 			lst_qty = "";
@@ -614,19 +657,48 @@ void CGFTraderDlg::OnBnClickedTrade()
 
 	CButton* pBtn1 = (CButton*)this->GetDlgItem(IDTRADE);
 	pBtn1->EnableWindow(stop_trade);
-	CButton* pBtn2 = (CButton*)this->GetDlgItem(IDSTOP);
+	CButton* pBtn2 = (CButton*)this->GetDlgItem(IDSTOPTRADE);
 	pBtn2->EnableWindow(!stop_trade);
 
 }
 
 
-void CGFTraderDlg::OnBnClickedStop()
+void CGFTraderDlg::OnBnClickedBalance()
 {
-	// TODO: Add your control notification handler code here
+	// TODO: 在此添加控件通知处理程序代码
+	if (getMYSQLConnection())
+	{
+		UINT rst = AfxMessageBox(L"你确定要一键平仓吗？", MB_YESNO);
+		if (rst == IDYES)
+		{
+			mysql_query(&m_sqlCon, "update usrstk set stop_trade_mode_flg = 1 where gz_flg = 1 and stop_trade_mode_flg = 0 and suggested_by <> 'SYSTEM_SUGGESTER'");
+
+			int count = mysql_affected_rows(&m_sqlCon);
+
+			if (count >= 1)
+			{
+				mysql_commit(&m_sqlCon);
+			}
+			else
+			{
+				mysql_rollback(&m_sqlCon);
+			}
+
+			CString msg;
+			msg.Format(_T("一共有 %d 支股票设置平仓."), count);
+			AfxMessageBox(msg);
+		}
+	}
+}
+
+
+void CGFTraderDlg::OnBnClickedStoptrade()
+{
+	// TODO: 在此添加控件通知处理程序代码
 	stop_trade = true;
 	bck_thread = NULL;
 	CButton* pBtn1 = (CButton*)this->GetDlgItem(IDTRADE);
 	pBtn1->EnableWindow(stop_trade);
-	CButton* pBtn2 = (CButton*)this->GetDlgItem(IDSTOP);
+	CButton* pBtn2 = (CButton*)this->GetDlgItem(IDSTOPTRADE);
 	pBtn2->EnableWindow(!stop_trade);
 }
