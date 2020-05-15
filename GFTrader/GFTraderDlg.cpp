@@ -328,6 +328,9 @@ DWORD WINAPI ThreadTrade(LPVOID pParam)
 				//GF_Wnd->ShowWindow(SW_HIDE);
 				//::Sleep(200);
 				//maximize window.
+
+			Again:
+
 				GF_Wnd->ShowWindow(SW_MAXIMIZE);
 				::Sleep(ACTION_DELAY_200);
 
@@ -348,8 +351,6 @@ DWORD WINAPI ThreadTrade(LPVOID pParam)
 				{
 					dlg->clickMouse(GF_Wnd, BUY_MENU);
 					::Sleep(ACTION_DELAY_200);
-
-				BuyAgain:
 
 					dlg->clickMouse(GF_Wnd, STOCK_FIELD);
 					dlg->clearField(GF_Wnd);
@@ -388,7 +389,7 @@ DWORD WINAPI ThreadTrade(LPVOID pParam)
 					}
 					else
 					{
-						goto BuyAgain;
+						goto Again;
 					}
 
 					lst_stock = code;
@@ -399,8 +400,6 @@ DWORD WINAPI ThreadTrade(LPVOID pParam)
 				{
 					dlg->clickMouse(GF_Wnd, SELL_MENU);
 					::Sleep(ACTION_DELAY_200);
-
-				SellAgain:
 
 					dlg->clickMouse(GF_Wnd, STOCK_FIELD);
 					dlg->clearField(GF_Wnd);
@@ -438,7 +437,7 @@ DWORD WINAPI ThreadTrade(LPVOID pParam)
 					}
 					else
 					{
-						goto SellAgain;
+						goto Again;
 					}
 
 					lst_stock = code;
