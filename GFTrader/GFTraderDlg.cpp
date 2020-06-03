@@ -23,6 +23,8 @@ CPoint TRADE_MENU(317, 14);
 CPoint BUY_MENU(42, 70);
 CPoint SELL_MENU(48, 105);
 CPoint STOCK_FIELD(271, 114);
+CPoint PRICE_FIELD(340, 146);
+CPoint PRICE_OPT5(298, 278);
 CPoint QTY_FIELD(210, 243);
 CPoint BUY_SELL_BTN(268, 340);
 CPoint YES_CONFIRM_PNT(1047, 634);
@@ -358,6 +360,11 @@ DWORD WINAPI ThreadTrade(LPVOID pParam)
 					dlg->sendString(GF_Wnd, code);
 					::Sleep(ACTION_DELAY_1000);
 
+					dlg->clickMouse(GF_Wnd, PRICE_FIELD);
+					::Sleep(ACTION_DELAY_200);
+					dlg->clickMouse(GF_Wnd, PRICE_OPT5);
+					::Sleep(ACTION_DELAY_200);
+
 					dlg->clickMouse(GF_Wnd, QTY_FIELD);
 					dlg->clearField(GF_Wnd);
 					::Sleep(ACTION_DELAY_200);
@@ -406,6 +413,11 @@ DWORD WINAPI ThreadTrade(LPVOID pParam)
 					::Sleep(ACTION_DELAY_200);
 					dlg->sendString(GF_Wnd, code);
 					::Sleep(ACTION_DELAY_1000);
+
+					dlg->clickMouse(GF_Wnd, PRICE_FIELD);
+					::Sleep(ACTION_DELAY_200);
+					dlg->clickMouse(GF_Wnd, PRICE_OPT5);
+					::Sleep(ACTION_DELAY_200);
 
 					dlg->clickMouse(GF_Wnd, QTY_FIELD);
 					dlg->clearField(GF_Wnd);
