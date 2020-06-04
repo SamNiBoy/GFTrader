@@ -657,6 +657,13 @@ void CGFTraderDlg::clearField(CWnd* pWnd)
 		pWnd->SendMessage(WM_KEYUP, VK_BACK);
 		//::Sleep(300);
 	}
+	for (int i = 0; i < 10; i++)
+	{
+		pWnd->SendMessage(WM_KEYDOWN, VK_DELETE);
+		pWnd->SendMessage(WM_CHAR, VK_DELETE);
+		pWnd->SendMessage(WM_KEYUP, VK_DELETE);
+		//::Sleep(300);
+	}
 }
 void CGFTraderDlg::OnBnClickedCancel()
 {
