@@ -37,6 +37,7 @@ public:
 	afx_msg
 		void sendString(CWnd* pWnd, CString str);
 	void clearField(CWnd* pWnd);
+	BOOLEAN SetFiledValues();
 	void OnBnClickedCancel();
 	void OnBnClickedTrade();
 	afx_msg boolean checkPointHasColor(CPoint pt, COLORREF clr);
@@ -46,4 +47,14 @@ public:
 	void pressKey(CWnd* pwnd, CHAR c);
 	afx_msg void OnBnClickedBalance();
 	afx_msg void OnBnClickedStoptrade();
+	afx_msg void OnEnChangeStock();
+	afx_msg void OnBnClickedTrade4();
+	afx_msg void OnBnClickedBtnBuy();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	afx_msg void OnBnClickedBtnSellDef();
+	afx_msg void OnEnChangeStockId();
+	afx_msg void OnEnKillfocusStockId();
+	afx_msg void OnEnKillfocusTradeMny();
+	afx_msg void OnBnClickedBtnSell();
+	afx_msg void OnEnKillfocusTradeHands();
 };

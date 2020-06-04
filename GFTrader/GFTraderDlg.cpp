@@ -48,6 +48,8 @@ boolean mysql_init_flg = false;
 
 boolean stop_trade = true;
 
+HACCEL  hAccTable;
+
 
 class CAboutDlg : public CDialogEx
 {
@@ -79,6 +81,7 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
+	
 END_MESSAGE_MAP()
 
 
@@ -105,6 +108,12 @@ BEGIN_MESSAGE_MAP(CGFTraderDlg, CDialogEx)
 	ON_BN_CLICKED(IDTRADE, &CGFTraderDlg::OnBnClickedTrade)
 	ON_BN_CLICKED(IDBALANCE, &CGFTraderDlg::OnBnClickedBalance)
 	ON_BN_CLICKED(IDSTOPTRADE, &CGFTraderDlg::OnBnClickedStoptrade)
+	
+	ON_BN_CLICKED(IDC_BTN_BUY, &CGFTraderDlg::OnBnClickedBtnBuy)
+	ON_EN_KILLFOCUS(IDC_STOCK_ID, &CGFTraderDlg::OnEnKillfocusStockId)
+	ON_EN_KILLFOCUS(IDC_TRADE_MNY, &CGFTraderDlg::OnEnKillfocusTradeMny)
+	ON_BN_CLICKED(IDC_BTN_SELL, &CGFTraderDlg::OnBnClickedBtnSell)
+	ON_EN_KILLFOCUS(IDC_TRADE_HANDS, &CGFTraderDlg::OnEnKillfocusTradeHands)
 END_MESSAGE_MAP()
 
 
@@ -140,6 +149,8 @@ BOOL CGFTraderDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
 	// TODO: Add extra initialization here
+
+	hAccTable = LoadAccelerators(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_ACC_BTN_BUY));
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -712,4 +723,310 @@ void CGFTraderDlg::OnBnClickedStoptrade()
 	pBtn1->EnableWindow(stop_trade);
 	CButton* pBtn2 = (CButton*)this->GetDlgItem(IDSTOPTRADE);
 	pBtn2->EnableWindow(!stop_trade);
+}
+
+
+void CGFTraderDlg::OnEnChangeStock()
+{
+	// TODO:  如果该控件是 RICHEDIT 控件，它将不
+	// 发送此通知，除非重写 CDialogEx::OnInitDialog()
+	// 函数并调用 CRichEditCtrl().SetEventMask()，
+	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+
+	// TODO:  在此添加控件通知处理程序代码
+}
+
+
+void CGFTraderDlg::OnBnClickedBtnBuy()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CString str;
+	CEdit* pEdit;
+	CString stkid;
+	pEdit = (CEdit*)GetDlgItem(IDC_STOCK_ID);
+	pEdit->GetWindowText(str);
+
+	stkid = str;
+
+	if (stkid.GetLength() <= 0) {
+		AfxMessageBox(_T("请输入股票代码!"));
+		return;
+	}
+
+	pEdit = (CEdit*)GetDlgItem(IDC_TRADE_HANDS);
+	pEdit->GetWindowText(str);
+
+	int hands = _wtof(str);
+
+	if (hands <= 0)
+	{
+		AfxMessageBox(_T("购买数量为零!"));
+		return;
+	}
+
+
+	if (getMYSQLConnection())
+	{
+		
+		CString sql;
+
+		//mysql_query(&m_sqlCon, "SET NAMES 'UTF-8'");
+
+		sql.Format(_T("insert into pendingTrade select '" + stkid + "', case when max(id) is null then 0 else max(id) + 1 end, %d , 0, 0, 0.0, 'N', null, 1, sysdate(), sysdate() from pendingTrade where stock = '" + stkid + "'"), hands);
+		mysql_query(&m_sqlCon, (CStringA)sql);
+
+		m_res = mysql_store_result(&m_sqlCon);
+
+		int count = mysql_affected_rows(&m_sqlCon);
+
+		if (count >= 1)
+		{
+			mysql_commit(&m_sqlCon);
+
+			str.Format(_T("下单购买:" + stkid + " %d 手成功!"), hands / 100);
+			AfxMessageBox(str);
+		}
+		else
+		{
+			mysql_rollback(&m_sqlCon);
+		}
+		mysql_close(&m_sqlCon);
+	}
+}
+
+
+BOOL CGFTraderDlg::PreTranslateMessage(MSG* pMsg)
+{
+	// TODO: 在此添加专用代码和/或调用基类
+	if (::TranslateAccelerator(GetSafeHwnd(), hAccTable, pMsg))
+	{
+		return true;
+	}
+	return CDialogEx::PreTranslateMessage(pMsg);
+}
+
+
+void CGFTraderDlg::OnEnKillfocusStockId()
+{
+	// TODO: 在此添加控件通知处理程序代码
+
+	CEdit* pBoxOne;
+	pBoxOne = (CEdit*)GetDlgItem(IDC_STOCK_ID);
+	CString str;
+	pBoxOne->GetWindowText(str);
+
+	if (str.GetLength() > 0) {
+		pBoxOne = (CEdit*)GetDlgItem(IDC_TRADE_MNY);
+		pBoxOne->SetWindowText(_T(""));
+		pBoxOne = (CEdit*)GetDlgItem(IDC_TRADE_HANDS);
+		pBoxOne->SetWindowText(_T(""));
+		SetFiledValues();
+		return;
+	}
+}
+
+BOOLEAN CGFTraderDlg::SetFiledValues()
+{
+	BOOLEAN ready_to_go = false;
+	CString str;
+	CEdit* pEdit;
+	pEdit = (CEdit*)GetDlgItem(IDC_STOCK_ID);
+
+	pEdit->GetWindowText(str);
+
+	if (str.GetLength() <= 0) {
+		AfxMessageBox(_T("请输入股票代码!"));
+		return false;
+	}
+
+	if (getMYSQLConnection())
+	{
+		CString stkid = str;
+		CString sql;
+
+		//mysql_query(&m_sqlCon, "SET NAMES 'UTF-8'");
+
+		sql.Format(_T("select s.name, s3.cur_pri from stk s join (select id, max(ft_id) max_ft_id from stkdat2 group by id) s2 on s.id = s2.id  join stkdat2 s3 on s2.max_ft_id = s3.ft_id where s.id = '%s'"), stkid);
+		mysql_query(&m_sqlCon, (CStringA)sql);
+
+		m_res = mysql_store_result(&m_sqlCon);
+
+		std::vector<std::string> m_data[100];
+		int i = 0;
+		if (m_row = mysql_fetch_row(m_res))
+		{
+			CString name = (CString)m_row[0];
+			CString price = (CString)m_row[1];
+
+			pEdit = (CEdit*)GetDlgItem(IDC_STOCK_NAME);
+			pEdit->SetWindowText(stkid + "/" + price);
+
+			pEdit = (CEdit*)GetDlgItem(IDC_TRADE_MNY);
+			pEdit->GetWindowText(str);
+
+			double trade_tot_mny = 0;
+			if (str.GetLength() <= 0) {
+
+				pEdit = (CEdit*)GetDlgItem(IDC_TRADE_HANDS);
+				pEdit->GetWindowText(str);
+
+				if (str.GetLength() > 0)
+				{
+					pEdit = (CEdit*)GetDlgItem(IDC_TRADE_MNY);
+					trade_tot_mny = _wtof(str) * _wtof(price);
+					str.Format((_T("%.0f")), trade_tot_mny);
+					pEdit->SetWindowText(str);
+					return true;
+				}
+
+				pEdit = (CEdit*)GetDlgItem(IDC_TRADE_MNY_DEF);
+				pEdit->GetWindowText(str);
+
+				if (str.GetLength() <= 0) {
+
+					str = "10000";
+					pEdit->SetWindowText(_T("10000"));
+				}
+			}
+
+			trade_tot_mny = _wtof(str);
+
+			int hands = trade_tot_mny / _wtof(price);
+
+			hands = hands / 100 * 100;
+
+			if (hands <= 0)
+			{
+				AfxMessageBox(_T("购买数量为零!"));
+				return false;
+			}
+			else
+			{
+				pEdit = (CEdit*)GetDlgItem(IDC_TRADE_HANDS);
+				str.Format(_T("%d"), hands);
+				pEdit->SetWindowText(str);
+
+				pEdit = (CEdit*)GetDlgItem(IDC_TRADE_MNY);
+				trade_tot_mny = hands * _wtof(price);
+				str.Format((_T("%.0f")), trade_tot_mny);
+				pEdit->SetWindowText(str);
+
+				ready_to_go = true;
+			}
+			//str.Format(_T(" Are you sure to buy stock:%s with price %s for %d hands?"), stkid, price, hands);
+			//AfxMessageBox(str);
+		}
+		mysql_free_result(m_res);
+		mysql_close(&m_sqlCon);
+	}
+	else 
+	{
+		AfxMessageBox(_T("数据库连接失败!"));
+	}
+	return ready_to_go;
+}
+
+void CGFTraderDlg::OnEnKillfocusTradeMny()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CEdit* pEdit;
+	CString str;
+
+	pEdit = (CEdit*)GetDlgItem(IDC_STOCK_ID);
+
+	pEdit->GetWindowText(str);
+
+	if (str.GetLength() <= 0) {
+		return;
+	}
+
+	pEdit = (CEdit*)GetDlgItem(IDC_TRADE_MNY);
+	
+	pEdit->GetWindowText(str);
+
+	SetFiledValues();
+}
+
+
+void CGFTraderDlg::OnBnClickedBtnSell()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CString str;
+	CEdit* pEdit;
+	CString stkid;
+	pEdit = (CEdit*)GetDlgItem(IDC_STOCK_ID);
+	pEdit->GetWindowText(str);
+
+	stkid = str;
+
+	if (stkid.GetLength() <= 0) {
+		AfxMessageBox(_T("请输入股票代码!"));
+		return;
+	}
+
+	pEdit = (CEdit*)GetDlgItem(IDC_TRADE_HANDS);
+	pEdit->GetWindowText(str);
+
+	int hands = _wtof(str);
+
+	if (hands <= 0)
+	{
+		AfxMessageBox(_T("售出数量为零!"));
+		return;
+	}
+
+
+	if (getMYSQLConnection())
+	{
+
+		CString sql;
+
+		//mysql_query(&m_sqlCon, "SET NAMES 'UTF-8'");
+
+		sql.Format(_T("insert into pendingTrade select '" + stkid + "', case when max(id) is null then 0 else max(id) + 1 end, %d , 0, 0, 0.0, 'N', null, 0, sysdate(), sysdate() from pendingTrade where stock = '" + stkid + "'"), hands);
+		mysql_query(&m_sqlCon, (CStringA)sql);
+
+		m_res = mysql_store_result(&m_sqlCon);
+
+		int count = mysql_affected_rows(&m_sqlCon);
+
+		if (count >= 1)
+		{
+			mysql_commit(&m_sqlCon);
+
+			str.Format(_T("下单出售:" + stkid + " %d 手成功!"), hands / 100);
+			AfxMessageBox(str);
+		}
+		else
+		{
+			mysql_rollback(&m_sqlCon);
+		}
+		mysql_close(&m_sqlCon);
+	}
+}
+
+
+void CGFTraderDlg::OnEnKillfocusTradeHands()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CEdit* pEdit;
+	pEdit = (CEdit*)GetDlgItem(IDC_STOCK_ID);
+	CString str;
+	pEdit->GetWindowText(str);
+
+	if (str.GetLength() > 0) {
+
+		pEdit = (CEdit*)GetDlgItem(IDC_TRADE_HANDS);
+		pEdit->GetWindowText(str);
+
+		if (str.GetLength() > 0)
+		{
+			pEdit = (CEdit*)GetDlgItem(IDC_TRADE_MNY);
+			pEdit->GetWindowText(str);
+			pEdit->SetWindowText(_T(""));
+		}
+
+		SetFiledValues();
+		return;
+	}
 }
