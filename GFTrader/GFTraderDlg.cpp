@@ -37,8 +37,8 @@ COLORREF OK_BTN_BLUE_COLOR = RGB(63, 151, 240);
 
 
 int ACTION_DELAY_200 = 200;
-int ACTION_DELAY_500 = 500;
-int ACTION_DELAY_1000 = 1000;
+int ACTION_DELAY_500 = 300;
+int ACTION_DELAY_1000 = 500;
 // CAboutDlg dialog used for App About
 
 MYSQL m_sqlCon;
@@ -114,6 +114,9 @@ BEGIN_MESSAGE_MAP(CGFTraderDlg, CDialogEx)
 	ON_EN_KILLFOCUS(IDC_TRADE_MNY, &CGFTraderDlg::OnEnKillfocusTradeMny)
 	ON_BN_CLICKED(IDC_BTN_SELL, &CGFTraderDlg::OnBnClickedBtnSell)
 	ON_EN_KILLFOCUS(IDC_TRADE_HANDS, &CGFTraderDlg::OnEnKillfocusTradeHands)
+//	ON_WM_KEYUP()
+//ON_WM_KEYDOWN()
+ON_WM_CLOSE()
 END_MESSAGE_MAP()
 
 
@@ -622,7 +625,7 @@ CString CGFTraderDlg::getTradeString(CString &lst_stock, CString &lst_qty, CStri
 				}
 			}
 			mysql_free_result(m_res);
-			mysql_close(&m_sqlCon);
+			//mysql_close(&m_sqlCon);
 		return rtv;
 	}
 }
@@ -668,6 +671,7 @@ void CGFTraderDlg::clearField(CWnd* pWnd)
 void CGFTraderDlg::OnBnClickedCancel()
 {
 	// TODO: Add your control notification handler code here
+	OnClose();
 	CDialogEx::OnOK();
 }
 
@@ -797,7 +801,7 @@ void CGFTraderDlg::OnBnClickedBtnBuy()
 		{
 			mysql_rollback(&m_sqlCon);
 		}
-		mysql_close(&m_sqlCon);
+		//mysql_close(&m_sqlCon);
 	}
 }
 
@@ -808,6 +812,24 @@ BOOL CGFTraderDlg::PreTranslateMessage(MSG* pMsg)
 	if (::TranslateAccelerator(GetSafeHwnd(), hAccTable, pMsg))
 	{
 		return true;
+	}
+
+	if (WM_KEYDOWN == pMsg->message && VK_RETURN == pMsg->wParam)
+	{
+		if (GetFocus() == GetDlgItem(IDC_STOCK_ID))
+		{
+			CEdit* pEdit;
+			pEdit = (CEdit*)GetDlgItem(IDC_TRADE_MNY);
+			pEdit->SetFocus();
+			return true;
+		}
+		else if (GetFocus() == GetDlgItem(IDC_TRADE_MNY))
+		{
+			CEdit* pEdit;
+			pEdit = (CEdit*)GetDlgItem(IDC_TRADE_HANDS);
+			pEdit->SetFocus();
+			return true;
+		}
 	}
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
@@ -924,7 +946,7 @@ BOOLEAN CGFTraderDlg::SetFiledValues()
 			//AfxMessageBox(str);
 		}
 		mysql_free_result(m_res);
-		mysql_close(&m_sqlCon);
+		//mysql_close(&m_sqlCon);
 	}
 	else 
 	{
@@ -1008,7 +1030,7 @@ void CGFTraderDlg::OnBnClickedBtnSell()
 		{
 			mysql_rollback(&m_sqlCon);
 		}
-		mysql_close(&m_sqlCon);
+		
 	}
 }
 
@@ -1036,4 +1058,13 @@ void CGFTraderDlg::OnEnKillfocusTradeHands()
 		SetFiledValues();
 		return;
 	}
+}
+
+
+void CGFTraderDlg::OnClose()
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+	//AfxMessageBox(_T("Close db connection and exit?"));
+	mysql_close(&m_sqlCon);
+	CDialogEx::OnClose();
 }

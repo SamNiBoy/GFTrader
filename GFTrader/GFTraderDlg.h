@@ -57,4 +57,7 @@ public:
 	afx_msg void OnEnKillfocusTradeMny();
 	afx_msg void OnBnClickedBtnSell();
 	afx_msg void OnEnKillfocusTradeHands();
+//	afx_msg void OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
+//	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+	afx_msg void OnClose();
 };
