@@ -473,7 +473,7 @@ DWORD WINAPI ThreadTrade(LPVOID pParam)
 				::Sleep(ACTION_DELAY_500);
 			}
 			else {
-				::Sleep(ACTION_DELAY_1000);
+				::Sleep(1000);
 			}
 		}
 	}
@@ -875,7 +875,7 @@ BOOLEAN CGFTraderDlg::SetFiledValues()
 
 		//mysql_query(&m_sqlCon, "SET NAMES 'UTF-8'");
 
-		sql.Format(_T("select s.name, s3.cur_pri from stk s join (select id, max(ft_id) max_ft_id from stkdat2 group by id) s2 on s.id = s2.id  join stkdat2 s3 on s2.max_ft_id = s3.ft_id where s.id = '%s'"), stkid);
+		sql.Format(_T("select s.name, s3.cur_pri from stk s join (select id, max(ft_id) max_ft_id from stkdat2 where id = '%s' group by id) s2 on s.id = s2.id  join stkdat2 s3 on s2.max_ft_id = s3.ft_id where s.id = '%s'"), stkid, stkid);
 		mysql_query(&m_sqlCon, (CStringA)sql);
 
 		m_res = mysql_store_result(&m_sqlCon);
