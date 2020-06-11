@@ -37,8 +37,9 @@ COLORREF OK_BTN_BLUE_COLOR = RGB(63, 151, 240);
 
 
 int ACTION_DELAY_200 = 200;
-int ACTION_DELAY_500 = 300;
-int ACTION_DELAY_1000 = 500;
+int ACTION_DELAY_300 = 300;
+int ACTION_DELAY_500 = 500;
+int ACTION_DELAY_1000 = 1000;
 // CAboutDlg dialog used for App About
 
 MYSQL m_sqlCon;
@@ -366,7 +367,7 @@ DWORD WINAPI ThreadTrade(LPVOID pParam)
 				if (action == "B")
 				{
 					dlg->clickMouse(GF_Wnd, BUY_MENU);
-					::Sleep(ACTION_DELAY_200);
+					::Sleep(ACTION_DELAY_300);
 
 					dlg->clickMouse(GF_Wnd, STOCK_FIELD);
 					dlg->clearField(GF_Wnd);
@@ -386,12 +387,12 @@ DWORD WINAPI ThreadTrade(LPVOID pParam)
 					::Sleep(ACTION_DELAY_200);
 
 					dlg->clickMouse(GF_Wnd, BUY_SELL_BTN);
-					::Sleep(ACTION_DELAY_1000);
+					::Sleep(ACTION_DELAY_500);
 
 					if (dlg->checkPointHasColor(YES_CONFIRM_PNT, YES_CONFIRM_BLUE_COLOR))
 					{
 						dlg->clickMouse(GF_Wnd, YES_CONFIRM_PNT);
-						::Sleep(ACTION_DELAY_500);
+						::Sleep(ACTION_DELAY_300);
 
 						if (dlg->checkPointHasColor(OK_BTN_BLUE_COLOR_PNT, OK_BTN_BLUE_COLOR))
 						{
@@ -420,13 +421,13 @@ DWORD WINAPI ThreadTrade(LPVOID pParam)
 				else if (action == 'S')
 				{
 					dlg->clickMouse(GF_Wnd, SELL_MENU);
-					::Sleep(ACTION_DELAY_200);
+					::Sleep(ACTION_DELAY_300);
 
 					dlg->clickMouse(GF_Wnd, STOCK_FIELD);
 					dlg->clearField(GF_Wnd);
 					::Sleep(ACTION_DELAY_200);
 					dlg->sendString(GF_Wnd, code);
-					::Sleep(ACTION_DELAY_1000);
+					::Sleep(ACTION_DELAY_500);
 
 					dlg->clickMouse(GF_Wnd, PRICE_FIELD);
 					::Sleep(ACTION_DELAY_200);
@@ -439,12 +440,12 @@ DWORD WINAPI ThreadTrade(LPVOID pParam)
 					dlg->sendString(GF_Wnd, qty);
 					::Sleep(ACTION_DELAY_200);
 					dlg->clickMouse(GF_Wnd, BUY_SELL_BTN);
-					::Sleep(ACTION_DELAY_1000);
+					::Sleep(ACTION_DELAY_500);
 
 					if (dlg->checkPointHasColor(YES_CONFIRM_PNT, YES_CONFIRM_BLUE_COLOR))
 					{
 						dlg->clickMouse(GF_Wnd, YES_CONFIRM_PNT);
-						::Sleep(ACTION_DELAY_500);
+						::Sleep(ACTION_DELAY_300);
 
 						if (dlg->checkPointHasColor(OK_BTN_BLUE_COLOR_PNT, OK_BTN_BLUE_COLOR))
 						{
@@ -470,10 +471,10 @@ DWORD WINAPI ThreadTrade(LPVOID pParam)
 					lst_qty = qty;
 					lst_price = "0.0";
 				}
-				::Sleep(ACTION_DELAY_500);
+				::Sleep(ACTION_DELAY_300);
 			}
 			else {
-				::Sleep(1000);
+				::Sleep(ACTION_DELAY_1000);
 			}
 		}
 	}
