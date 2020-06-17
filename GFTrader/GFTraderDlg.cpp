@@ -22,6 +22,7 @@
 CPoint TRADE_MENU(317, 14);
 CPoint BUY_MENU(42, 70);
 CPoint SELL_MENU(48, 105);
+COLORREF SELL_MENU_BLUE_COLOR = RGB(63, 151, 240);
 CPoint STOCK_FIELD(271, 114);
 CPoint PRICE_FIELD(340, 146);
 CPoint PRICE_OPT5(298, 278);
@@ -421,7 +422,11 @@ DWORD WINAPI ThreadTrade(LPVOID pParam)
 				else if (action == 'S')
 				{
 					dlg->clickMouse(GF_Wnd, SELL_MENU);
-					::Sleep(ACTION_DELAY_300);
+					::Sleep(ACTION_DELAY_1000);
+
+					if (!dlg->checkPointHasColor(SELL_MENU, SELL_MENU_BLUE_COLOR)) {
+						goto Again;
+					}
 
 					dlg->clickMouse(GF_Wnd, STOCK_FIELD);
 					dlg->clearField(GF_Wnd);
@@ -439,6 +444,9 @@ DWORD WINAPI ThreadTrade(LPVOID pParam)
 					::Sleep(ACTION_DELAY_200);
 					dlg->sendString(GF_Wnd, qty);
 					::Sleep(ACTION_DELAY_200);
+
+
+
 					dlg->clickMouse(GF_Wnd, BUY_SELL_BTN);
 					::Sleep(ACTION_DELAY_500);
 
