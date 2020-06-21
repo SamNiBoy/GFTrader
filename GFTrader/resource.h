@@ -14,10 +14,14 @@
 #define IDC_STOCK_ID                    1001
 #define IDC_BTN_BUY                     1002
 #define IDC_BTN_SELL                    1003
+#define IDC_BTN_SET_WIN_PRICE           1004
+#define IDC_BTN_SET_LOST_PRICE          1005
 #define IDC_TRADE_MNY                   1006
 #define IDC_TRADE_HANDS                 1007
 #define IDC_STOCK_NAME                  1008
 #define IDC_TRADE_MNY_DEF               1009
+#define IDC_TRADE_WIN_PRICE             1010
+#define IDC_TRADE_LOST_PRICE            1011
 
 // Next default values for new objects
 // 
