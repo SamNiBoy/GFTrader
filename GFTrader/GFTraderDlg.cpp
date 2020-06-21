@@ -602,6 +602,7 @@ CString CGFTraderDlg::getTradeString(CString &lst_stock, CString &lst_qty, CStri
 		}
 		
 		//mysql_query(&m_sqlCon, "SET NAMES 'UTF-8'");//解决从数据库中读取数据后汉字乱码显示的问题  
+		mysql_commit(&m_sqlCon);
 
 			//查询数据
 			if (mysql_query(&m_sqlCon, "select stock, id, qty, price, is_buy_flg, type from pendingTrade where status = 'N' order by stock"))
