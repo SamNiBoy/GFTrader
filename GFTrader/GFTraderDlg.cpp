@@ -121,6 +121,7 @@ BEGIN_MESSAGE_MAP(CGFTraderDlg, CDialogEx)
 ON_WM_CLOSE()
 ON_BN_CLICKED(IDC_BTN_SET_WIN_PRICE, &CGFTraderDlg::OnBnClickedBtnSetWinPrice)
 ON_BN_CLICKED(IDC_BTN_SET_LOST_PRICE, &CGFTraderDlg::OnBnClickedBtnSetLostPrice)
+ON_BN_CLICKED(IDC_BTN_BUY_IF_PRICE, &CGFTraderDlg::OnBnClickedBtnBuyIfPrice)
 END_MESSAGE_MAP()
 
 
@@ -644,7 +645,7 @@ CString CGFTraderDlg::getTradeString(CString &lst_stock, CString &lst_qty, CStri
 						}
 					}
 				
-				if ((type == "W" || type == "L") && price.GetLength() > 0 && stock_id.GetLength() > 0 && qty.GetLength() > 0)
+				if ((type == "W" || type == "L" || type == "BP") && price.GetLength() > 0 && stock_id.GetLength() > 0 && qty.GetLength() > 0)
 				{
 					CString sql = (CString)"";
 					MYSQL_RES* m_res2;
@@ -667,6 +668,10 @@ CString CGFTraderDlg::getTradeString(CString &lst_stock, CString &lst_qty, CStri
 						else if (type == "L" && now_price <= pre_price)
 						{
 							rtv = (CString)"S" + stock_id + qty;
+						}
+						else if (type == "BP" && now_price <= pre_price)
+						{
+							rtv = (CString)"B" + stock_id + qty;
 						}
 					}
 					mysql_free_result(m_res2);
@@ -1298,6 +1303,91 @@ void CGFTraderDlg::OnBnClickedBtnSetLostPrice()
 			{
 				mysql_commit(&m_sqlCon);
 				AfxMessageBox(_T("止损价格已设置!"));
+			}
+			else
+			{
+				mysql_rollback(&m_sqlCon);
+			}
+		}
+		return;
+	}
+}
+
+void CGFTraderDlg::OnBnClickedBtnBuyIfPrice()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CEdit* pEdit;
+	pEdit = (CEdit*)GetDlgItem(IDC_STOCK_ID);
+	CString stock_id;
+	pEdit->GetWindowText(stock_id);
+
+	pEdit = (CEdit*)GetDlgItem(IDC_TRADE_BUY_IF_PRICE);
+	CString l_price;
+	pEdit->GetWindowText(l_price);
+
+	pEdit = (CEdit*)GetDlgItem(IDC_TRADE_HANDS);
+	CString hands;
+	pEdit->GetWindowText(hands);
+
+	if (!(stock_id.GetLength() > 0 && l_price.GetLength() > 0 && hands.GetLength() > 0))
+	{
+		AfxMessageBox(_T("股票代码、预买价格、数量必输!"));
+		return;
+	}
+
+	if (getMYSQLConnection())
+	{
+		mysql_query(&m_sqlCon, (CString)"delete from pendingTrade where stock = '" + stock_id + "' and type = 'BP' and status = 'N'");
+
+		int count = mysql_affected_rows(&m_sqlCon);
+		mysql_commit(&m_sqlCon);
+
+		MYSQL_RES* m_res2;
+		MYSQL_ROW m_row2;
+		CString sql = (CString)"";
+		sql.Format(_T("select cur_pri from stkdat2 s1 where id = '%s' and ft_id = (select max(ft_id) from stkdat2 s2 where s2.id = '%s') "), stock_id, stock_id);
+		mysql_query(&m_sqlCon, (CStringA)sql);
+
+		m_res2 = mysql_store_result(&m_sqlCon);
+
+		std::vector<std::string> m_data[100];
+		CString price = (CString)"";
+		bool createSellEntry = false;
+		if (m_row2 = mysql_fetch_row(m_res2))
+		{
+			price = (CString)m_row2[0];
+			double now_price = _wtof(price);
+			double buy_if_price = _wtof(l_price);
+			if (now_price <= buy_if_price)
+			{
+				UINT rst = AfxMessageBox(L"预买价格已达，现在买？", MB_YESNO);
+				if (rst == IDYES)
+				{
+					createSellEntry = true;
+				}
+				else
+				{
+					createSellEntry = false;
+				}
+			}
+			else
+			{
+				createSellEntry = true;
+			}
+		}
+		mysql_free_result(m_res2);
+
+		if (createSellEntry)
+		{
+
+			sql.Format(_T("insert into pendingTrade select '" + stock_id + "', case when max(id) is null then 0 else max(id) + 1 end, " + hands + " , " + l_price + ", 0, 0.0, 'N','BP', null, 1, sysdate(), sysdate() from pendingTrade where stock = '" + stock_id + "'"));
+			mysql_query(&m_sqlCon, (CStringA)sql);
+			int count = mysql_affected_rows(&m_sqlCon);
+
+			if (count == 1)
+			{
+				mysql_commit(&m_sqlCon);
+				AfxMessageBox(_T("预买价格已设置!"));
 			}
 			else
 			{

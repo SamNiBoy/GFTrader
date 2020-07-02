@@ -62,4 +62,5 @@ public:
 	afx_msg void OnClose();
 	afx_msg void OnBnClickedBtnSetWinPrice();
 	afx_msg void OnBnClickedBtnSetLostPrice();
+	afx_msg void OnBnClickedBtnBuyIfPrice();
 };

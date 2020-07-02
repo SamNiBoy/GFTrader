@@ -22,6 +22,8 @@
 #define IDC_TRADE_MNY_DEF               1009
 #define IDC_TRADE_WIN_PRICE             1010
 #define IDC_TRADE_LOST_PRICE            1011
+#define IDC_TRADE_BUY_IF_PRICE          1012
+#define IDC_BTN_BUY_IF_PRICE            1013
 
 // Next default values for new objects
 // 
