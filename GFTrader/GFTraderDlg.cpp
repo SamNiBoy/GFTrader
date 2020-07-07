@@ -24,7 +24,7 @@ CPoint BUY_MENU(42, 70);
 CPoint SELL_MENU(48, 105);
 COLORREF SELL_MENU_BLUE_COLOR = RGB(63, 151, 240);
 CPoint STOCK_FIELD(271, 114);
-CPoint PRICE_FIELD(340, 146);
+CPoint PRICE_TYPE_FIELD(340, 146);
 CPoint PRICE_OPT5(298, 278);
 CPoint QTY_FIELD(210, 243);
 CPoint BUY_SELL_BTN(268, 340);
@@ -379,10 +379,10 @@ DWORD WINAPI ThreadTrade(LPVOID pParam)
 					dlg->sendString(GF_Wnd, code);
 					::Sleep(ACTION_DELAY_1000);
 
-					dlg->clickMouse(GF_Wnd, PRICE_FIELD);
-					::Sleep(ACTION_DELAY_200);
+					dlg->clickMouse(GF_Wnd, PRICE_TYPE_FIELD);
+					::Sleep(ACTION_DELAY_500);
 					dlg->clickMouse(GF_Wnd, PRICE_OPT5);
-					::Sleep(ACTION_DELAY_200);
+					::Sleep(ACTION_DELAY_500);
 
 					dlg->clickMouse(GF_Wnd, QTY_FIELD);
 					dlg->clearField(GF_Wnd);
@@ -437,10 +437,10 @@ DWORD WINAPI ThreadTrade(LPVOID pParam)
 					dlg->sendString(GF_Wnd, code);
 					::Sleep(ACTION_DELAY_500);
 
-					dlg->clickMouse(GF_Wnd, PRICE_FIELD);
-					::Sleep(ACTION_DELAY_200);
+					dlg->clickMouse(GF_Wnd, PRICE_TYPE_FIELD);
+					::Sleep(ACTION_DELAY_500);
 					dlg->clickMouse(GF_Wnd, PRICE_OPT5);
-					::Sleep(ACTION_DELAY_200);
+					::Sleep(ACTION_DELAY_500);
 
 					dlg->clickMouse(GF_Wnd, QTY_FIELD);
 					dlg->clearField(GF_Wnd);
