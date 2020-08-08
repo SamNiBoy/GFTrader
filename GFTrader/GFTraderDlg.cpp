@@ -109,7 +109,6 @@ BEGIN_MESSAGE_MAP(CGFTraderDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDCANCEL, &CGFTraderDlg::OnBnClickedCancel)
 	ON_BN_CLICKED(IDTRADE, &CGFTraderDlg::OnBnClickedTrade)
-	ON_BN_CLICKED(IDBALANCE, &CGFTraderDlg::OnBnClickedBalance)
 	ON_BN_CLICKED(IDSTOPTRADE, &CGFTraderDlg::OnBnClickedStoptrade)
 	
 	ON_BN_CLICKED(IDC_BTN_BUY, &CGFTraderDlg::OnBnClickedBtnBuy)
@@ -123,6 +122,8 @@ ON_WM_CLOSE()
 ON_BN_CLICKED(IDC_BTN_SET_WIN_PRICE, &CGFTraderDlg::OnBnClickedBtnSetWinPrice)
 ON_BN_CLICKED(IDC_BTN_SET_LOST_PRICE, &CGFTraderDlg::OnBnClickedBtnSetLostPrice)
 ON_BN_CLICKED(IDC_BTN_BUY_IF_PRICE, &CGFTraderDlg::OnBnClickedBtnBuyIfPrice)
+ON_BN_CLICKED(IDKEEPBALANCE, &CGFTraderDlg::OnBnClickedKeepbalance)
+ON_BN_CLICKED(IDSELLMODE, &CGFTraderDlg::OnBnClickedSellmode)
 END_MESSAGE_MAP()
 
 
@@ -760,33 +761,7 @@ void CGFTraderDlg::OnBnClickedTrade()
 }
 
 
-void CGFTraderDlg::OnBnClickedBalance()
-{
-	// TODO: 在此添加控件通知处理程序代码
-	if (getMYSQLConnection())
-	{
-		UINT rst = AfxMessageBox(L"你确定要一键平仓吗？", MB_YESNO);
-		if (rst == IDYES)
-		{
-			mysql_query(&m_sqlCon, "update usrstk set stop_trade_mode_flg = 1 where gz_flg = 1 and stop_trade_mode_flg = 0 and suggested_by <> 'SYSTEM_SUGGESTER'");
 
-			int count = mysql_affected_rows(&m_sqlCon);
-
-			if (count >= 1)
-			{
-				mysql_commit(&m_sqlCon);
-			}
-			else
-			{
-				mysql_rollback(&m_sqlCon);
-			}
-
-			CString msg;
-			msg.Format(_T("一共有 %d 支股票设置平仓."), count);
-			AfxMessageBox(msg);
-		}
-	}
-}
 
 
 void CGFTraderDlg::OnBnClickedStoptrade()
@@ -1403,4 +1378,175 @@ void CGFTraderDlg::OnBnClickedBtnBuyIfPrice()
 		}
 		return;
 	}
+}
+
+void CGFTraderDlg::OnBnClickedKeepbalance()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	if (getMYSQLConnection())
+	{
+		mysql_query(&m_sqlCon, "select sum(sell_now_flg) sumval from usrstk where gz_flg = 1 and suggested_by <> 'SYSTEM_SUGGESTER'");
+
+		MYSQL_RES* m_res2;
+		MYSQL_ROW m_row2;
+
+		boolean enableModeFlg = true;
+
+		m_res2 = mysql_store_result(&m_sqlCon);
+
+		std::vector<std::string> m_data[100];
+		CString sumval;
+		if (m_row2 = mysql_fetch_row(m_res2))
+		{
+			sumval = (CString)m_row2[0];
+		}
+		mysql_free_result(m_res2);
+
+		if (_wtof(sumval) > 0)
+		{
+			enableModeFlg = false;
+
+		}
+		else {
+			enableModeFlg = true;
+
+		}
+
+		UINT rst = 999;
+		if (enableModeFlg)
+		{
+			rst = AfxMessageBox(L"你确定要打开平仓模式吗？", MB_YESNO);
+		}
+		else
+		{
+			rst = AfxMessageBox(L"你确定要关闭平仓模式吗？", MB_YESNO);
+		}
+		
+		if (rst == IDYES)
+		{
+			mysql_query(&m_sqlCon, "update usrstk set sell_now_flg = 1 - sell_now_flg where gz_flg = 1 and suggested_by <> 'SYSTEM_SUGGESTER'");
+
+			int count = mysql_affected_rows(&m_sqlCon);
+
+			if (count >= 1)
+			{
+				mysql_commit(&m_sqlCon);
+			}
+			else
+			{
+				mysql_rollback(&m_sqlCon);
+			}
+
+			if (count >= 1)
+			{
+				if (enableModeFlg)
+				{
+					CString msg;
+					msg.Format(_T("一共有 %d 支股票已打开平仓模式."), count);
+					AfxMessageBox(msg);
+					CButton* pBtn1 = (CButton*)this->GetDlgItem(IDKEEPBALANCE);
+					pBtn1->SetWindowTextW(_T("关闭平仓模式"));
+				}
+				else
+				{
+					CString msg;
+					msg.Format(_T("一共有 %d 支股票已关闭平仓模式."), count);
+					AfxMessageBox(msg);
+					CButton* pBtn1 = (CButton*)this->GetDlgItem(IDKEEPBALANCE);
+					pBtn1->SetWindowTextW(_T("打开平仓模式"));
+				}
+			}
+			else {
+				CString msg;
+				msg.Format(_T("一共有 %d 支股票被处理."), count);
+				AfxMessageBox(msg);
+			}
+		}
+	}
+}
+
+void CGFTraderDlg::OnBnClickedSellmode()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	if (getMYSQLConnection())
+	{
+		mysql_query(&m_sqlCon, "select sum(stop_trade_mode_flg) sumval from usrstk where gz_flg = 1 and suggested_by <> 'SYSTEM_SUGGESTER'");
+
+		MYSQL_RES* m_res2;
+		MYSQL_ROW m_row2;
+
+		boolean enableModeFlg = true;
+
+		m_res2 = mysql_store_result(&m_sqlCon);
+
+		std::vector<std::string> m_data[100];
+		CString sumval;
+		if (m_row2 = mysql_fetch_row(m_res2))
+		{
+			sumval = (CString)m_row2[0];
+		}
+		mysql_free_result(m_res2);
+
+		if (_wtof(sumval) > 0)
+		{
+			enableModeFlg = false;
+
+		}
+		else {
+			enableModeFlg = true;
+
+		}
+
+		UINT rst = 999;
+		if (enableModeFlg)
+		{
+			rst = AfxMessageBox(L"你确定要打开只卖不买模式吗？", MB_YESNO);
+		}
+		else
+		{
+			rst = AfxMessageBox(L"你确定要关闭只卖不买模式吗？", MB_YESNO);
+		}
+
+		if (rst == IDYES)
+		{
+			mysql_query(&m_sqlCon, "update usrstk set stop_trade_mode_flg = 1 - stop_trade_mode_flg where gz_flg = 1 and suggested_by <> 'SYSTEM_SUGGESTER'");
+
+			int count = mysql_affected_rows(&m_sqlCon);
+
+			if (count >= 1)
+			{
+				mysql_commit(&m_sqlCon);
+			}
+			else
+			{
+				mysql_rollback(&m_sqlCon);
+			}
+
+			if (count >= 1)
+			{
+				if (enableModeFlg)
+				{
+					CString msg;
+					msg.Format(_T("一共有 %d 支股票已打开只卖不买模式."), count);
+					AfxMessageBox(msg);
+					CButton* pBtn1 = (CButton*)this->GetDlgItem(IDSELLMODE);
+					pBtn1->SetWindowTextW(_T("关闭只卖不买模式"));
+				}
+				else
+				{
+					CString msg;
+					msg.Format(_T("一共有 %d 支股票已关闭只卖不买模式."), count);
+					AfxMessageBox(msg);
+					CButton* pBtn1 = (CButton*)this->GetDlgItem(IDSELLMODE);
+					pBtn1->SetWindowTextW(_T("打开只卖不买模式"));
+				}
+			}
+			else {
+				CString msg;
+				msg.Format(_T("一共有 %d 支股票被处理."), count);
+				AfxMessageBox(msg);
+			}
+		}
+	}
+
 }

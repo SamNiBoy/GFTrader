@@ -3,7 +3,9 @@
 // π© GFTrader.rc  π”√
 //
 #define IDBALANCE                       6
+#define IDSELLMODE                      6
 #define IDSTOPTRADE                     7
+#define IDKEEPBALANCE                   9
 #define IDM_ABOUTBOX                    0x0010
 #define IDD_ABOUTBOX                    100
 #define IDS_ABOUTBOX                    101

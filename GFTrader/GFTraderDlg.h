@@ -45,7 +45,6 @@ public:
 	CString getTradeString(CString& lst_stock, CString& lst_qty, CString& lst_price, CString success_flg);
 	void clickMouse(CWnd* pwnd, CPoint pt);
 	void pressKey(CWnd* pwnd, CHAR c);
-	afx_msg void OnBnClickedBalance();
 	afx_msg void OnBnClickedStoptrade();
 	afx_msg void OnEnChangeStock();
 	afx_msg void OnBnClickedTrade4();
@@ -63,4 +62,6 @@ public:
 	afx_msg void OnBnClickedBtnSetWinPrice();
 	afx_msg void OnBnClickedBtnSetLostPrice();
 	afx_msg void OnBnClickedBtnBuyIfPrice();
+	afx_msg void OnBnClickedKeepbalance();
+	afx_msg void OnBnClickedSellmode();
 };
