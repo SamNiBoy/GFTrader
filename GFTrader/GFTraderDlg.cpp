@@ -1385,7 +1385,7 @@ void CGFTraderDlg::OnBnClickedKeepbalance()
 	// TODO: 在此添加控件通知处理程序代码
 	if (getMYSQLConnection())
 	{
-		mysql_query(&m_sqlCon, "select sum(sell_now_flg) sumval from usrstk where gz_flg = 1 and suggested_by <> 'SYSTEM_SUGGESTER'");
+		mysql_query(&m_sqlCon, "select sum(sell_now_flg) sumval from usrstk where gz_flg = 1 ");
 
 		MYSQL_RES* m_res2;
 		MYSQL_ROW m_row2;
@@ -1424,7 +1424,7 @@ void CGFTraderDlg::OnBnClickedKeepbalance()
 		
 		if (rst == IDYES)
 		{
-			mysql_query(&m_sqlCon, "update usrstk set sell_now_flg = 1 - sell_now_flg where gz_flg = 1 and suggested_by <> 'SYSTEM_SUGGESTER'");
+			mysql_query(&m_sqlCon, "update usrstk set sell_now_flg = 1 - sell_now_flg where gz_flg = 1 ");
 
 			int count = mysql_affected_rows(&m_sqlCon);
 
@@ -1470,7 +1470,7 @@ void CGFTraderDlg::OnBnClickedSellmode()
 	// TODO: 在此添加控件通知处理程序代码
 	if (getMYSQLConnection())
 	{
-		mysql_query(&m_sqlCon, "select sum(stop_trade_mode_flg) sumval from usrstk where gz_flg = 1 and suggested_by <> 'SYSTEM_SUGGESTER'");
+		mysql_query(&m_sqlCon, "select sum(stop_trade_mode_flg) sumval from usrstk where gz_flg = 1");
 
 		MYSQL_RES* m_res2;
 		MYSQL_ROW m_row2;
@@ -1509,7 +1509,7 @@ void CGFTraderDlg::OnBnClickedSellmode()
 
 		if (rst == IDYES)
 		{
-			mysql_query(&m_sqlCon, "update usrstk set stop_trade_mode_flg = 1 - stop_trade_mode_flg where gz_flg = 1 and suggested_by <> 'SYSTEM_SUGGESTER'");
+			mysql_query(&m_sqlCon, "update usrstk set stop_trade_mode_flg = 1 - stop_trade_mode_flg where gz_flg = 1 ");
 
 			int count = mysql_affected_rows(&m_sqlCon);
 
