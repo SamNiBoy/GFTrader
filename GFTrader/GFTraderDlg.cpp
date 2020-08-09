@@ -124,6 +124,7 @@ ON_BN_CLICKED(IDC_BTN_SET_LOST_PRICE, &CGFTraderDlg::OnBnClickedBtnSetLostPrice)
 ON_BN_CLICKED(IDC_BTN_BUY_IF_PRICE, &CGFTraderDlg::OnBnClickedBtnBuyIfPrice)
 ON_BN_CLICKED(IDKEEPBALANCE, &CGFTraderDlg::OnBnClickedKeepbalance)
 ON_BN_CLICKED(IDSELLMODE, &CGFTraderDlg::OnBnClickedSellmode)
+ON_BN_CLICKED(IDC_BTN_SET_SELL_NOW_FLG, &CGFTraderDlg::OnBnClickedBtnSetSellNowFlg)
 END_MESSAGE_MAP()
 
 
@@ -1549,4 +1550,94 @@ void CGFTraderDlg::OnBnClickedSellmode()
 		}
 	}
 
+}
+
+
+void CGFTraderDlg::OnBnClickedBtnSetSellNowFlg()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CEdit* pEdit;
+	pEdit = (CEdit*)GetDlgItem(IDC_STOCK_ID);
+	CString stock_id;
+	pEdit->GetWindowText(stock_id);
+
+	if (!(stock_id.GetLength() > 0))
+	{
+		AfxMessageBox(_T("股票代码必输!"));
+		return;
+	}
+
+	if (getMYSQLConnection())
+	{
+		mysql_query(&m_sqlCon, (CString)"select sum(sell_now_flg) sumval from usrstk where id = '" + stock_id + "' ");
+
+		MYSQL_RES* m_res2;
+		MYSQL_ROW m_row2;
+
+		boolean enableModeFlg = true;
+
+		m_res2 = mysql_store_result(&m_sqlCon);
+
+		std::vector<std::string> m_data[100];
+		CString sumval;
+		if (m_row2 = mysql_fetch_row(m_res2))
+		{
+			sumval = (CString)m_row2[0];
+		}
+		mysql_free_result(m_res2);
+
+		if (_wtof(sumval) > 0)
+		{
+			enableModeFlg = false;
+
+		}
+		else {
+			enableModeFlg = true;
+
+		}
+
+		UINT rst = 999;
+		if (enableModeFlg)
+		{
+			rst = AfxMessageBox(L"你确定为该股打开平仓模式吗？", MB_YESNO);
+		}
+		else
+		{
+			rst = AfxMessageBox(L"你确定为该股关闭平仓模式吗？", MB_YESNO);
+		}
+
+		if (rst == IDYES)
+		{
+			mysql_query(&m_sqlCon, (CString)"update usrstk set sell_now_flg = 1 - sell_now_flg where id = '" + stock_id + "'");
+
+			int count = mysql_affected_rows(&m_sqlCon);
+
+			if (count >= 1)
+			{
+				mysql_commit(&m_sqlCon);
+				if (enableModeFlg)
+				{
+					CString msg;
+					msg.Format(_T("已打开平仓模式!"), count);
+					AfxMessageBox(msg);
+					CButton* pBtn1 = (CButton*)this->GetDlgItem(IDC_BTN_SET_SELL_NOW_FLG);
+					pBtn1->SetWindowTextW(_T("关平仓模式"));
+				}
+				else
+				{
+					CString msg;
+					msg.Format(_T("已关闭平仓模式!"), count);
+					AfxMessageBox(msg);
+					CButton* pBtn1 = (CButton*)this->GetDlgItem(IDC_BTN_SET_SELL_NOW_FLG);
+					pBtn1->SetWindowTextW(_T("开平仓模式"));
+				}
+			}
+			else
+			{
+				mysql_rollback(&m_sqlCon);
+				AfxMessageBox(_T("异常，未设置成功!"));
+			}
+		}
+		return;
+	}
 }

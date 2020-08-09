@@ -64,4 +64,5 @@ public:
 	afx_msg void OnBnClickedBtnBuyIfPrice();
 	afx_msg void OnBnClickedKeepbalance();
 	afx_msg void OnBnClickedSellmode();
+	afx_msg void OnBnClickedBtnSetSellNowFlg();
 };

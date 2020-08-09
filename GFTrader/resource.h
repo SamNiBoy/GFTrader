@@ -26,6 +26,8 @@
 #define IDC_TRADE_LOST_PRICE            1011
 #define IDC_TRADE_BUY_IF_PRICE          1012
 #define IDC_BTN_BUY_IF_PRICE            1013
+#define IDC_BTN_SET_WIN_PRICE2          1014
+#define IDC_BTN_SET_SELL_NOW_FLG        1014
 
 // Next default values for new objects
 // 
